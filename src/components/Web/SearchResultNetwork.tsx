@@ -358,7 +358,7 @@ export const SearchResultNetwork = (props: Props) => {
       .join('g')
     // Enabling keys on network
     // makes node focusable
-      .attr('tabindex', 0)
+      .attr('tabindex', -1)
     // adds ARIA role and label for accessibility
       .attr('role', 'button')
       .attr(
@@ -596,6 +596,11 @@ export const SearchResultNetwork = (props: Props) => {
     }
 
     node.on('keydown', (event: KeyboardEvent, d: NodeDatum) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        svgRef.current?.focus()
+        return
+      }
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         highlight(d.id)
@@ -740,7 +745,20 @@ export const SearchResultNetwork = (props: Props) => {
     <div ref={containerRef} className="flex flex-col gap-6">
       <div className={containerClass}>
         <div className={`relative ${svgWrapperClass}`}>
-          <svg ref={svgRef} className="w-full h-full" role="img" aria-label="Search result network" />
+          <svg
+            ref={svgRef}
+            className="w-full h-full"
+            role="application"
+            aria-label="Species network graph. Press Enter or Space to navigate nodes, arrow keys to move between them, Escape to exit."
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                const firstNode = svgRef.current?.querySelector<HTMLElement>('[tabindex="-1"]')
+                firstNode?.focus()
+              }
+            }}
+          />
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             <button
               type="button"

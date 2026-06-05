@@ -206,6 +206,7 @@ export const Web = () => {
   const [isPartnerLoading, setIsPartnerLoading] = useState(false)
   const [isSuggestionLoading, setIsSuggestionLoading] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1)
   const [isLocationSuggestionLoading, setIsLocationSuggestionLoading] =
     useState(false)
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false)
@@ -213,6 +214,7 @@ export const Web = () => {
     []
   )
   const [shouldDisplayResults, setShouldDisplayResults] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
   const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(
     null
   )
@@ -776,7 +778,8 @@ export const Web = () => {
       const close = () => setIsDropdownOpen(false)
       document.addEventListener('click', close)
       document.addEventListener('keydown', (evt) => {
-        if (evt.key === 'Escape' || evt.key === 'Enter') close()
+        if (evt.key === 'Escape') close()
+        if (evt.key === 'Enter' && focusedSuggestionIndex < 0) close()
       })
       return () => {
         document.removeEventListener('click', close)
@@ -888,6 +891,17 @@ export const Web = () => {
     setIsLocationSuggestionLoading(false)
     setPlaceLookupError(null)
     setAdvancedSearchError(null)
+  }
+
+  const handleSuggestionClick = (s: Suggestion) => {
+    setSearch(s.label)
+    const match = suggestionSource.find(
+      (t) => (t.preferred_common_name || t.name) === s.label
+    )
+    setSelectedTaxonId(match?.id ?? null)
+    setSelectedThumbnail(s.thumbnail ?? null)
+    setFocusedSuggestionIndex(-1)
+    void handleSubmit(undefined, s.label, s.thumbnail ?? null)
   }
 
   const handleSubmit = async (
@@ -1098,9 +1112,12 @@ export const Web = () => {
   useEffect(() => {
     if (shouldDisplayResults && hasResults) {
       setSearchError(null)
+      setStatusMessage(`${filteredResults.length} result${filteredResults.length === 1 ? '' : 's'} found`)
+    } else if (shouldDisplayResults && !isResultsLoading) {
+      setStatusMessage('No results found')
     }
     setSelectedView(hasResults ? 'grid' : null)
-  }, [hasResults, shouldDisplayResults])
+  }, [hasResults, shouldDisplayResults, isResultsLoading])
 
   const getObservationLabel = (observation?: Observation) =>
     observation?.taxon.preferred_common_name || observation?.taxon.name || ''
@@ -1252,6 +1269,7 @@ export const Web = () => {
   // ---------------------
   return (
     <>
+      <div aria-live="polite" aria-atomic="true" className="sr-only">{statusMessage}</div>
       <div className="sticky top-[72px] z-40 bg-white p-5">
         <div className="flex flex-col gap-2 w-full items-center">
           <div className="flex flex-row gap-10 mb-4 -mt-2">
@@ -1346,6 +1364,7 @@ export const Web = () => {
             {/* Who eats bar */}
             <div className="hidden sm:flex sm:w-[16rem] sm:shrink-0 sm:flex-col sm:gap-2 sm:items-centers">
               <select
+                aria-label="Search direction"
                 className="form-select form-select-lg w-full"
                 value={type}
                 onChange={(evt) => {
@@ -1370,6 +1389,7 @@ export const Web = () => {
                 {/* who eats bar + search input + go button FOR MOBILE */}
                 <div className="sm:hidden">
                   <select
+                    aria-label="Search direction"
                     className="form-select w-[8rem] px-2 py-1.75 pr-7 text-[12px] text-xs"
                     value={type}
                     onChange={(evt) => {
@@ -1406,35 +1426,31 @@ export const Web = () => {
                           : ''
                       }`}
                       type="text"
+                      aria-label="Organism name"
                       onChange={handleInputChange}
                       value={search}
                       placeholder={searchError || 'Organism (ex. Osprey)'}
+                      onKeyDown={(e) => {
+                        if (!isDropdownOpen || !suggestions.length) return
+                        if (e.key === 'ArrowDown') { e.preventDefault(); setFocusedSuggestionIndex((i) => (i + 1) % suggestions.length) }
+                        else if (e.key === 'ArrowUp') { e.preventDefault(); setFocusedSuggestionIndex((i) => (i - 1 + suggestions.length) % suggestions.length) }
+                        else if ((e.key === 'Enter' || e.key === ' ') && focusedSuggestionIndex >= 0) { e.preventDefault(); handleSuggestionClick(suggestions[focusedSuggestionIndex]) }
+                      }}
                     />
 
                     <Dropdown
                       isLoading={isSuggestionLoading}
                       isOpen={isDropdownOpen}
                       suggestions={suggestions}
-                      onClick={(s) => {
-                        setSearch(s.label)
-                        const match = suggestionSource.find(
-                          (t) => (t.preferred_common_name || t.name) === s.label
-                        )
-                        setSelectedTaxonId(match?.id ?? null)
-                        setSelectedThumbnail(s.thumbnail ?? null)
-                        void handleSubmit(
-                          undefined,
-                          s.label,
-                          s.thumbnail ?? null
-                        )
-                      }}
+                      focusedIndex={focusedSuggestionIndex}
+                      onClick={handleSuggestionClick}
                     />
                   </div>
                   {/* Go button only on wide screens*/}
                   <button
                     type="submit"
                     disabled={isResolvingPlace}
-                    className={`ml-1 sm:block hidden shrink-0 rounded bg-orange-500 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
+                    className={`ml-1 sm:block hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
                       isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
@@ -1446,7 +1462,7 @@ export const Web = () => {
               <button
                 type="submit"
                 disabled={isResolvingPlace}
-                className={`ml-1 sm:hidden shrink-0 rounded bg-orange-500 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
+                className={`ml-1 sm:hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
                   isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >

@@ -11,6 +11,7 @@ interface Props {
   isLoading: boolean
   isOpen: boolean
   suggestions: Suggestion[]
+  focusedIndex?: number
   onClick: (s: Suggestion) => void
 }
 
@@ -31,7 +32,7 @@ export const Dropdown = (props: Props) => {
   // --------------------- ===
   //  PROPS
   // ---------------------
-  const { isLoading, isOpen, suggestions, onClick } = props
+  const { isLoading, isOpen, suggestions, focusedIndex = -1, onClick } = props
 
   // --------------------- ===
   //  RENDER
@@ -56,12 +57,12 @@ export const Dropdown = (props: Props) => {
               <p className="text-sm text-gray-500 italic">No suggestions</p>
             )}
 
-            {suggestions.map((s) => (
+            {suggestions.map((s, i) => (
               <button
                 key={s.label}
                 onClick={() => onClick(s)}
                 type="button"
-                className="flex items-center gap-2 text-start hover:bg-slate-100 rounded md:p-1 text-xs md:text-md lg:text-base"
+                className={`flex items-center gap-2 text-start rounded md:p-1 text-xs md:text-md lg:text-base ${i === focusedIndex ? 'bg-slate-100' : 'hover:bg-slate-100'}`}
               >
                 {s.thumbnail && (
                   <img
