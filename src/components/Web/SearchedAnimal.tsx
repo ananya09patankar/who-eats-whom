@@ -60,6 +60,7 @@ export const SearchResultGrid = (props: Props) => {
             href={displayObservation.uri}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${commonName ? `${commonName} (${scientificName})` : scientificName}, ${roleLabel}, view observation`}
             className="block rounded-lg overflow-hidden bg-white border border-slate-200 shadow-sm transition hover:border-slate-300 hover:shadow"
           >
             <div className="h-48 w-full overflow-hidden bg-slate-100 relative">
@@ -93,7 +94,7 @@ export const SearchResultGrid = (props: Props) => {
                       type="button"
                       onClick={toggleAttribution(result.id)}
                       aria-expanded={!!openAttributionById[result.id]}
-                      aria-label="Toggle image attribution"
+                      aria-label={`Show copyright information for ${commonName || scientificName} image`}
                       className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-slate-900 font-semibold border border-black hover:bg-slate-100"
                     >
                       CC

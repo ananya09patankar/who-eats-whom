@@ -504,7 +504,7 @@ export const Web = () => {
 
         setRecentTaxon(
           mostRecentWithResearchPartner.taxon.preferred_common_name ||
-            mostRecentWithResearchPartner.taxon.name
+          mostRecentWithResearchPartner.taxon.name
         )
         setRecentTaxDate(readable)
       } catch (error) {
@@ -1055,9 +1055,9 @@ export const Web = () => {
       selectedThumbnail,
       draftSelectedPlaceId !== null
         ? {
-            id: draftSelectedPlaceId,
-            label: draftSelectedPlaceLabel ?? (nextLocation || null),
-          }
+          id: draftSelectedPlaceId,
+          label: draftSelectedPlaceLabel ?? (nextLocation || null),
+        }
         : undefined,
       nextLocation
     )
@@ -1210,9 +1210,8 @@ export const Web = () => {
     const location = selectedPlaceLabel ? sanitize(selectedPlaceLabel) : null
     const prefix = type === 'eaten' ? 'Who Eats' : 'Who is Eaten By'
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const fileName = `${prefix} ${species}${
-      location ? ` - ${location}` : ''
-    } ${timestamp}.csv`
+    const fileName = `${prefix} ${species}${location ? ` - ${location}` : ''
+      } ${timestamp}.csv`
 
     const link = document.createElement('a')
     link.href = url
@@ -1330,13 +1329,11 @@ export const Web = () => {
                               if (!disabled) setSelectedView(key)
                               setMiniToolBarOpen(false)
                             }}
-                            className={`flex justify-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors text-sm ${
-                              selectedView === key
+                            className={`flex justify-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors text-sm ${selectedView === key
                                 ? 'bg-slate-900 text-white border-slate-900'
                                 : 'bg-white text-slate-700 border-slate-200'
-                            } ${
-                              disabled ? 'cursor-not-allowed opacity-70' : ''
-                            }`}
+                              } ${disabled ? 'cursor-not-allowed opacity-70' : ''
+                              }`}
                           >
                             <Icon active={selectedView === key && !disabled} />
                             <span>{label}</span>
@@ -1420,13 +1417,15 @@ export const Web = () => {
                     style={{ zIndex: 1 }}
                   >
                     <input
-                      className={`w-full placeholder-[#bfb6b6] text-xs text-md sm:text-base ${
-                        searchError
+                      className={`w-full placeholder-[#bfb6b6] text-xs text-md sm:text-base ${searchError
                           ? 'border-red-500 text-red-600 placeholder:text-red-500'
                           : ''
-                      }`}
+                        }`}
                       type="text"
                       aria-label="Organism name"
+                      aria-autocomplete="list"
+                      aria-expanded={isDropdownOpen}
+                      aria-activedescendant={focusedSuggestionIndex >= 0 ? `suggestion-${focusedSuggestionIndex}` : undefined}
                       onChange={handleInputChange}
                       value={search}
                       placeholder={searchError || 'Organism (ex. Osprey)'}
@@ -1450,9 +1449,8 @@ export const Web = () => {
                   <button
                     type="submit"
                     disabled={isResolvingPlace}
-                    className={`ml-1 sm:block hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
-                      isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
-                    }`}
+                    className={`ml-1 sm:block hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
+                      }`}
                   >
                     {isResolvingPlace ? 'Loading...' : 'Go'}
                   </button>
@@ -1462,9 +1460,8 @@ export const Web = () => {
               <button
                 type="submit"
                 disabled={isResolvingPlace}
-                className={`ml-1 sm:hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${
-                  isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                className={`ml-1 sm:hidden shrink-0 rounded bg-orange-700 px-3 py-2 text-white font-semibold sm:ml-2 sm:px-4 ${isResolvingPlace ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
               >
                 {isResolvingPlace ? 'Loading...' : 'Go'}
               </button>
@@ -1717,11 +1714,10 @@ export const Web = () => {
                       onClick={() => {
                         if (!disabled) setSelectedView(key)
                       }}
-                      className={`flex items-center gap-2 rounded-md border px-4 py-2 text-xs transition-colors sm:gap-2 sm:px-4 sm:py-2 sm:text-sm ${
-                        selectedView === key
+                      className={`flex items-center gap-2 rounded-md border px-4 py-2 text-xs transition-colors sm:gap-2 sm:px-4 sm:py-2 sm:text-sm ${selectedView === key
                           ? 'bg-slate-900 text-white border-slate-900'
                           : 'bg-white text-slate-700 border-slate-200'
-                      } ${disabled ? 'cursor-not-allowed opacity-70' : ''}`}
+                        } ${disabled ? 'cursor-not-allowed opacity-70' : ''}`}
                     >
                       <Icon active={selectedView === key && !disabled} />
                       <span>{label}</span>

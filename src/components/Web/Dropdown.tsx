@@ -60,6 +60,7 @@ export const Dropdown = (props: Props) => {
             {suggestions.map((s, i) => (
               <button
                 key={s.label}
+                id={`suggestion-${i}`}
                 onClick={() => onClick(s)}
                 type="button"
                 className={`flex items-center gap-2 text-start rounded md:p-1 text-xs md:text-md lg:text-base ${i === focusedIndex ? 'bg-slate-100' : 'hover:bg-slate-100'}`}
